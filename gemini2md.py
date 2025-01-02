@@ -10,9 +10,9 @@ def format_markdown(json_data):
 
     # --- Header ---
     markdown_output += "# Gemini Pro Conversation\n\n"
-    markdown_output += f"**Model:** {json_data['runSettings']['model']}\n"
-    markdown_output += f"**Temperature:** {
-        json_data['runSettings']['temperature']}\n\n"
+    if 'runSettings' in json_data:
+        markdown_output += f"**Model:** {json_data['runSettings']['model']}\n"
+        markdown_output += f"**Temperature:** {json_data['runSettings']['temperature']}\n\n"
 
     # --- Citations ---
     if 'citations' in json_data and json_data['citations']:
@@ -24,52 +24,55 @@ def format_markdown(json_data):
         markdown_output += "\n"
 
     # --- System Instructions (Optional) ---
-    if json_data['systemInstruction']:
+    if 'systemInstruction' in json_data and json_data['systemInstruction']:
         markdown_output += "## System Instructions\n\n"
         markdown_output += json_data['systemInstruction'].get(
             'text', '') + "\n\n"
 
     # --- Conversation ---
     markdown_output += "## Conversation\n\n"
-    for chunk in json_data['chunkedPrompt']['chunks']:
-        if chunk['role'] == 'user':
-            markdown_output += "### User\n\n"
-        elif chunk['role'] == 'model':
-            markdown_output += "### Model\n\n"
+    if 'chunkedPrompt' in json_data and 'chunks' in json_data['chunkedPrompt']:
+        for chunk in json_data['chunkedPrompt']['chunks']:
+            if chunk['role'] == 'user':
+                markdown_output += "### User\n\n"
+            elif chunk['role'] == 'model':
+                markdown_output += "### Model\n\n"
 
-        # Handle "thoughts" differently
-        if chunk.get('isThought', False):
-            markdown_output += "> " + \
-                chunk.get('text', '').replace("\n", "\n> ") + "\n\n"
-        else:
-            if 'text' in chunk:
-                # Improved code block detection using regular expressions
-                code_block_pattern = r"```(?:\w+\n)?(.*?)```"
-                matches = re.findall(code_block_pattern,
-                                     chunk['text'], re.DOTALL)
+            # Handle "thoughts" differently
+            if chunk.get('isThought', False):
+                markdown_output += "> " + \
+                    chunk.get('text', '').replace("\n", "\n> ") + "\n\n"
+            else:
+                if 'text' in chunk:
+                    # Improved code block detection using regular expressions
+                    code_block_pattern = r"```(?:\w+\n)?(.*?)```"
+                    matches = re.findall(code_block_pattern,
+                                         chunk['text'], re.DOTALL)
 
-                if matches:
-                    for code_snippet in matches:
-                        markdown_output += "```\n" + code_snippet.strip() + "\n```\n\n"
-                else:
-                    markdown_output += chunk['text'] + "\n\n"
+                    if matches:
+                        for code_snippet in matches:
+                            markdown_output += "```\n" + code_snippet.strip() + "\n```\n\n"
+                    else:
+                        markdown_output += chunk['text'] + "\n\n"
+    else:
+        markdown_output += "No conversation data available.\n\n"
 
     return markdown_output
 
 
 def convert_json_to_markdown(input_path, output_path):  # Added output_path argument
     try:
-        with open(input_path, 'r') as f:
+        with open(input_path, 'r', encoding='utf-8') as f:
             json_data = json.load(f)
 
         markdown_content = format_markdown(json_data)
 
-        with open(output_path, 'w') as f:
+        with open(output_path, 'w', encoding='utf-8') as f:
             f.write(markdown_content)
 
         print(f"Successfully converted '{input_path}' to '{output_path}'")
 
-    except (FileNotFoundError, json.JSONDecodeError) as e:
+    except (FileNotFoundError, json.JSONDecodeError, UnicodeDecodeError) as e:
         print(f"Error processing '{input_path}': {e}")
 
 
