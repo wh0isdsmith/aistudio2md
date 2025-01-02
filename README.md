@@ -34,8 +34,8 @@ The script will:
 
 1. **Clone the Repository**:
    ```sh
-   git clone <repository-url>
-   cd <repository-directory>
+   git clone https://github.com/wh0isdsmith/aistudio2md
+   cd aistudio2md
    ```
 
 2. **Place Your Zip File**:
@@ -54,7 +54,7 @@ The script will:
 Here's a quick example of running the script:
 
 ```sh
-$ python gemini2md.py
+python gemini2md.py
 Unzipping complete and .json extension added to files.
 Successfully converted 'AI_Studio_Chats/example.json' to 'Markdown Chats/example.md'
 ```
