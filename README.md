@@ -1,8 +1,10 @@
+![](banner.jpeg)
+
 # 🚀 Gemini To Markdown Converter
 
 ## 🌟 Overview
 
-Transform your Google AI Studio JSON files into beautifully formatted Markdown documents with ease!
+Transform your Google AI Studio chats into beautifully formatted Markdown documents with ease!
 
 ## 📋 Steps
 
